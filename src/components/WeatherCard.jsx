@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
+import axios from 'axios'
 
-const WeatherCard = ({weather , temp, }) => {
+const WeatherCard = ({weather , temp, API_KEY, setIsLoading,setTemp,obj,setWheater }) => {
 
 
     const [isCelsius, setIsCelsius] = useState(true)
@@ -12,6 +13,29 @@ const WeatherCard = ({weather , temp, }) => {
         setIsCelsius(state=>!state)
         
     }
+    const inputCity = useRef()
+    const searchCity =e=>{
+        e.preventDefault()
+        axios.get(`https://api.openweathermap.org/data/2.5/weather?q=${inputCity.current.value}&appid=${API_KEY}`)
+        
+      .then(res =>{
+        setWheater(res.data)
+
+        console.log(res.data)
+        const celsius= (res.data.main.temp-273.15).toFixed(1)
+        const obj ={
+          celsius: celsius,
+          fahrentheit: ((res.data.main.temp-273.15)*(9/5)+32).toFixed(1)
+        }
+        setTemp(obj);
+      })
+      .catch(err=>console.log(err))
+      .finally(()=>setIsLoading(false))
+
+    }
+
+    
+    
  
 
   return (
@@ -46,8 +70,8 @@ const WeatherCard = ({weather , temp, }) => {
                 : `${temp?.fahrentheit} °F`}
             </h2>
             <button className='weather__btn' onClick={handleChangeTemp}>Change Temperature</button>
-            <form >
-                <input placeholder='Ingresar Ciudad'/>
+            <form  onSubmit={searchCity}>
+                <input ref={inputCity} placeholder='Ingresar Ciudad'/>
                 <button type='submit'>Consultar</button>
             </form>
         </footer>

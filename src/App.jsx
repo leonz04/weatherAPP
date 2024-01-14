@@ -9,9 +9,10 @@ import WeatherCard from './components/WeatherCard'
 function App() {
 
   const [coords, setCoords]=useState()
-  const [wheater, setwheater] = useState()
+  const [wheater, setWheater] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [temp, setTemp] = useState()
+  const [obj,setObj]=useState()
 
   
 
@@ -42,7 +43,7 @@ function App() {
 
       axios.get(url)
       .then(res =>{
-        setwheater(res.data)
+        setWheater(res.data)
         const celsius= (res.data.main.temp-273.15).toFixed(1)
         const obj ={
           celsius: celsius,
@@ -66,7 +67,13 @@ function App() {
       ? <h2>Loading...</h2>
       :(<WeatherCard
       weather={wheater}
-      temp ={temp}/>)
+      temp ={temp}
+      API_KEY={'7dac2439f4fc00cc375e1bab983133d1'}
+      setIsLoading={setIsLoading}
+      setTemp={setTemp}
+      obj={obj}
+      setWheater={setWheater}
+      />)
        
     }
    </div>
