@@ -1,10 +1,11 @@
 import React, { useRef, useState } from 'react'
 import axios from 'axios'
 
-const WeatherCard = ({weather , temp, API_KEY, setIsLoading,setTemp,obj,setWheater }) => {
+const WeatherCard = ({weather , temp, API_KEY, setIsLoading,setTemp,setWheater }) => {
 
 
     const [isCelsius, setIsCelsius] = useState(true)
+    
     
 
 

@@ -12,7 +12,38 @@ function App() {
   const [wheater, setWheater] = useState()
   const [isLoading, setIsLoading] = useState(true)
   const [temp, setTemp] = useState()
-  const [obj,setObj]=useState()
+  const [hasError, setHasError] = useState(false)
+  const [weatherDescription, setWeatherDescription] = useState('');
+
+  useEffect(() => {
+    // Actualiza el estado de la descripción del clima cuando cambia
+    if (wheater?.weather[0].description) {
+      setWeatherDescription(wheater.weather[0].description.toLowerCase());
+    }
+  }, [wheater?.weather[0].description]);
+
+  const getBackgroundClass = () => {
+    // Ejemplo: mapeo de descripciones a clases CSS
+    const classMappings = {
+      'clear sky': 'clear-sky',
+      'few clouds': 'few-clouds',
+      'scattered clouds':'scattered-clouds',
+      'broken clouds':'broken-clouds',
+      'shower rain':'rain',
+      'rain':'rain',
+      'thunderstorm':'thunderstorm',
+      'snow':'',
+      'mist':'mist',
+      'overcast clouds':'overcast-clouds',
+      'light rain':'light-rain',
+      'moderate rain':'moderate-rain'
+
+      // Agrega más mapeos según sea necesario
+    };
+
+    return classMappings[weatherDescription] || 'default-background';
+  };
+
 
   
 
@@ -29,9 +60,7 @@ function App() {
 
   useEffect(()=>{
     setIsLoading(true)
-    navigator.geolocation.getCurrentPosition(getDataLocation)
-
-    
+    navigator.geolocation.getCurrentPosition(getDataLocation,error)
   },[])
 
   useEffect(()=>{
@@ -44,6 +73,7 @@ function App() {
       axios.get(url)
       .then(res =>{
         setWheater(res.data)
+        setHasError(false)  
         const celsius= (res.data.main.temp-273.15).toFixed(1)
         const obj ={
           celsius: celsius,
@@ -51,19 +81,29 @@ function App() {
         }
         setTemp(obj);
       })
-      .catch(err=>console.log(err))
+      .catch(err=>{
+        console.log(err)
+      setHasError(true)})
       .finally(()=>setIsLoading(false))
 
     }
 
   },[coords])
 
+  const error = err => {
+    console.log(err)
+    // Agregar lógica para manejo de errores
+    setHasError(true)
+  }
+
 
 
   return (
-   <div className='app'>
+   <div className={`app ${getBackgroundClass()}`} >
     {
-      isLoading
+      hasError 
+      ? <h2 className='errorMsg'>Por favor permite al navegador el acceso a tu ubicacion</h2>
+      : isLoading
       ? <h2>Loading...</h2>
       :(<WeatherCard
       weather={wheater}
@@ -71,7 +111,6 @@ function App() {
       API_KEY={'7dac2439f4fc00cc375e1bab983133d1'}
       setIsLoading={setIsLoading}
       setTemp={setTemp}
-      obj={obj}
       setWheater={setWheater}
       />)
        
